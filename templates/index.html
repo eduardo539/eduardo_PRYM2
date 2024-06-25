@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predicción de Mejores Precios de Teléfonos en Ucrania</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+    </style>
+    <script>
+        function clasificarProducto(event) {
+            event.preventDefault();
+            const model_name = document.getElementById('model_name').value;
+            const lowest_price = document.getElementById('lowest_price').value;
+            const highest_price = document.getElementById('highest_price').value;
+            const screen_size = document.getElementById('screen_size').value;
+            const memory_size = document.getElementById('memory_size').value;
+            const selected_model = document.querySelector('input[name="selected_model"]:checked').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `model_name=${model_name}&lowest_price=${lowest_price}&highest_price=${highest_price}&screen_size=${screen_size}&memory_size=${memory_size}&selected_model=${selected_model}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultado').innerText = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('resultado').innerText = 'Mejor precio del artículo: ' + data.Mejor_precio + ' Grivnas';
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultado').innerText = 'Error en la solicitud.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Predicción de Mejores Precios de Teléfonos en Ucrania</h1>
+    <form id="formulario" onsubmit="clasificarProducto(event)">
+        <label for="model_name">Modelo del equipo:</label>
+        <select id="model_name" name="model_name" required>
+            <option value="0">Alcatel Bluish Black (5033D-2JALUAA)</option>
+            <option value="1">Alcatel Volcano Black (5033D-2LALUAF)</option>
+            <option value="2">Nokia Charcoal</option>
+            <option value="3">Honor 10 Black</option>
+            <option value="4">Honor 10 Lite Blue</option>
+            <option value="1063">iPhone XS Max Gold (MT522)</option>
+            <option value="1065">Huawei nova 5T Black (51094MEU)</option>
+            <option value="1066">ZTE nubia Red Magic 5G Black</option>
+            <!-- Agrega más opciones según sea necesario -->
+        </select><br><br>
+        <label for="lowest_price">Precio más Bajo:</label>
+        <input type="text" id="lowest_price" name="lowest_price" required><br><br>
+        <label for="highest_price">Precio más Alto:</label>
+        <input type="text" id="highest_price" name="highest_price" required><br><br>
+        <label for="screen_size">Tamaño de Pantalla:</label>
+        <input type="text" id="screen_size" name="screen_size" required><br><br>
+        <label for="memory_size">Tamaño de Memoria:</label>
+        <input type="text" id="memory_size" name="memory_size" required><br><br>
+        <label for="selected_model">Selecciona el modelo:</label><br>
+        <input type="radio" id="regression" name="selected_model" value="regression" checked>
+        <label for="regression">Regresión</label><br>
+        <input type="radio" id="neural_network" name="selected_model" value="neural_network">
+        <label for="neural_network">Redes Neuronales</label><br><br>
+        <input type="submit" value="Enviar">
+    </form>
+    <p id="resultado"></p>
+</body>
+</html>
